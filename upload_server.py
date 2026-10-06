@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""最简单文件上传服务器（仅标准库，Python 3.9+ 可用）。
+"""最简单文件上传服务器（仅标准库，Python 3.6+ 可用，CentOS 7 自带 python3 可跑）。
 
 用法:
     python3 upload_server.py [保存目录] [端口]
@@ -11,10 +11,15 @@
 """
 import html
 import os
+import socketserver
 import sys
 import time
 from urllib.parse import unquote
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+# ThreadingHTTPServer 要 3.7 才有（CentOS 7 的 python3 是 3.6），这里等价手写一个
+class ThreadingHTTPServer(socketserver.ThreadingMixIn, HTTPServer):
+    daemon_threads = True
 
 SAVE_DIR = sys.argv[1] if len(sys.argv) > 1 else "/srv"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 1983
